@@ -7,7 +7,7 @@ export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
 
-    const currency = import.meta.VITE_CURRENCY;
+    const currency = import.meta.env.VITE_CURRENCY;
 
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
@@ -26,6 +26,9 @@ export const AppContextProvider = ({ children }) => {
             }
 
     */
+
+    
+    const [searchQuery, setSearchQuery] = useState({});
 
     // Fetch All Products
     const fetchProducts = async () => {
@@ -76,7 +79,31 @@ export const AppContextProvider = ({ children }) => {
     }
 
 
-    const value = { navigate, user, setUser, isSeller, setIsSeller, showUserLogin, setShowUserLogin, products, currency, addToCart, updateCartItems, removeFromCart, cartItems };
+    // Function that calculates the total Cart Items
+    const getCartCount = () => {
+        // EG : cartItems = { "apple": 2, "banana": 3, "orange": 1 }
+        let totalCount = 0 ;
+        for(const item in cartItems){
+            // For example: cartItems["apple"] = 2, So we add that quantity to totalCount
+            totalCount += cartItems[item];
+        }
+
+        return totalCount ;
+    }
+
+    // Get Cart total Amount
+    const getCartAmount = () => {
+        let totalAmount = 0 ;
+        for(const item in cartItems){
+            let itemInfo = products.find((products) => products._id === item);
+            if(cartItems[item] > 0 ){
+                totalAmount += itemInfo.offerPrice * cartItems[item];
+            }
+        }
+        return Math.floor(totalAmount * 100) / 100 ;
+    }
+
+    const value = { navigate, user, setUser, isSeller, setIsSeller, showUserLogin, setShowUserLogin, products, currency, addToCart, updateCartItems, removeFromCart, cartItems , searchQuery , setSearchQuery, getCartCount, getCartAmount };
 
     return (
         <AppContext.Provider value={value} >
